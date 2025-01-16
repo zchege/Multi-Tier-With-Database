@@ -61,14 +61,19 @@ stages:
         steps: 
           - task: SonarQubePrepare@7
             inputs:
-              SonarQube: 'sonar-svc'
+              SonarQube: 'SonarQube Server'
               scannerMode: 'cli'
               configMode: 'manual'
               cliProjectKey: 'bankapp'
               cliProjectName: 'bankapp'
               cliSources: '.'
               extraProperties: 'sonar.java.binaries=.'
-              
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: |
+                $params = "$env:SONARQUBE_SCANNER_PARAMS" -replace '"sonar.branch.name":"[\w,/,-]*"\,?'
+                    Write-Host "##vso[task.setvariable variable=SONARQUBE_SCANNER_PARAMS]$params"
           - task: SonarQubeAnalyze@7
             inputs:
               jdkversion: 'JAVA_HOME_17_X64'
