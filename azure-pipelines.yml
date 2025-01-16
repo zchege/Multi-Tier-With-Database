@@ -1,0 +1,45 @@
+
+trigger: 
+   none
+
+pool:
+  name: DevOpsPool
+  demands:
+    - agent.name -equals MyAgent
+
+stages:
+  - stage: compile
+    displayName: 'Maven Compile'
+    jobs:
+      - job: maven_compile
+        steps:
+        - task: Maven@4
+          inputs:
+           azureSubscription: 'devopshack-conn'
+           mavenPomFile: 'pom.xml'
+           goals: 'compile'
+           publishJUnitResults: true
+           testResultsFiles: '**/surefire-reports/TEST-*.xml'
+           javaHomeOption: 'JDKVersion'
+           mavenVersionOption: 'Default'
+           mavenAuthenticateFeed: false
+           effectivePomSkip: false
+           sonarQubeRunAnalysis: false
+
+  - stage: test
+    displayName: 'Maven Test'
+    jobs:
+      - job: maven_test
+        steps:
+          - task: Maven@4
+            inputs:
+             azureSubscription: 'devopshack-conn'
+             mavenPomFile: 'pom.xml'
+             goals: 'test'
+             publishJUnitResults: true
+             testResultsFiles: '**/surefire-reports/TEST-*.xml'
+             javaHomeOption: 'JDKVersion'
+             mavenVersionOption: 'Default'
+             mavenAuthenticateFeed: false
+             effectivePomSkip: false
+             sonarQubeRunAnalysis: false
